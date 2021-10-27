@@ -6,12 +6,14 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public Vector2 direction;
-    public Vector2 position;
+    public List<Vector2> body = new List<Vector2>() { new Vector2(0, 0), };
     public Action onMovementDone;
+    private bool needsShrinking = true;
 
 	private void Start()
 	{
         StartCoroutine(Movement());
+        StartCoroutine(StartEating());
     }
 
 	void Update()
@@ -40,12 +42,37 @@ public class GameManager : MonoBehaviour
         while (true)
 		{
             //naujas vektorius = X + Y = (X1+X2 , Y1+Y2)
-            position = position + direction;
-            onMovementDone();
+            Vector2 newHeadPosition = body[body.Count - 1];
+            newHeadPosition = newHeadPosition + direction;
 
-            //yield return null;//skip viena kadra
-            yield return new WaitForSeconds(1);
+            body.Add(newHeadPosition);
+            if (needsShrinking)
+            {
+                body.RemoveAt(0);
+            }
+            needsShrinking = true;
 
+            if (onMovementDone != null)
+            {
+                onMovementDone();
+            }
+
+            yield return new WaitForSeconds(0.1f);
         }
+    }
+
+    private IEnumerator StartEating()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(2f);
+
+            Eat();
+        }
+    }
+
+    public void Eat()
+	{
+        needsShrinking = false;
     }
 }

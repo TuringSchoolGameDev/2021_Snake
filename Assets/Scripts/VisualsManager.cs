@@ -14,7 +14,7 @@ public class VisualsManager : MonoBehaviour
 
 	public void KaiPajudejom()
 	{
-		character.position = gameManager.position;
+		character.position = gameManager.body[gameManager.body.Count - 1];
 	}
 }
 
