@@ -5,16 +5,17 @@ using UnityEngine;
 public class VisualsManager : MonoBehaviour
 {
     public GameManager gameManager;
-	public Transform character;
+	public GameObject bodyPartPrefab;
 
 	private void Start()
 	{
 		gameManager.onMovementDone = KaiPajudejom;
 	}
 
-	public void KaiPajudejom()
+	public void KaiPajudejom(Vector2 headPosition)
 	{
-		character.position = gameManager.body[gameManager.body.Count - 1];
+		GameObject prefabInstance = Instantiate(bodyPartPrefab);
+		prefabInstance.transform.position = headPosition;
 	}
 }
 

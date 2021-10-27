@@ -6,8 +6,11 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public Vector2 direction;
+    /// <summary>
+    /// Paskutinis elementas visuomet bus galva.
+    /// </summary>
     public List<Vector2> body = new List<Vector2>() { new Vector2(0, 0), };
-    public Action onMovementDone;
+    public Action<Vector2> onMovementDone;
     private bool needsShrinking = true;
 
 	private void Start()
@@ -44,8 +47,8 @@ public class GameManager : MonoBehaviour
             //naujas vektorius = X + Y = (X1+X2 , Y1+Y2)
             Vector2 newHeadPosition = body[body.Count - 1];
             newHeadPosition = newHeadPosition + direction;
-
             body.Add(newHeadPosition);
+
             if (needsShrinking)
             {
                 body.RemoveAt(0);
@@ -54,7 +57,7 @@ public class GameManager : MonoBehaviour
 
             if (onMovementDone != null)
             {
-                onMovementDone();
+                onMovementDone(body[body.Count - 1]);
             }
 
             yield return new WaitForSeconds(0.1f);
@@ -66,7 +69,6 @@ public class GameManager : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(2f);
-
             Eat();
         }
     }
