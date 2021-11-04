@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour
     /// Paskutinis elementas visuomet bus galva.
     /// </summary>
     public List<Vector2> body = new List<Vector2>() { new Vector2(0, 0), };
-    public Action<Vector2> onMovementDone;
+    public Action<List<Vector2>> onMovementDone;
     private bool needsShrinking = true;
 
 	private void Start()
@@ -57,7 +57,7 @@ public class GameManager : MonoBehaviour
 
             if (onMovementDone != null)
             {
-                onMovementDone(body[body.Count - 1]);
+                onMovementDone(body);
             }
 
             yield return new WaitForSeconds(0.1f);
