@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour
 
 	private void Start()
 	{
+        direction = new Vector2(1, 0);
         body.Add(new Vector2((int)(boardSize.x + 1) / 2, (int)(boardSize.y + 1)/ 2));
         GenerateWalls();
         GenerateFood();
@@ -68,6 +69,16 @@ public class GameManager : MonoBehaviour
             }
             needsShrinking = true;
 
+            List<Vector2> bodyList = new List<Vector2>();
+            for (int i = 0; i < body.Count - 1; i++)
+            {
+                bodyList.Add(body[i]);
+            }
+            if (IsColliding(newHeadPosition, wallsPositions, bodyList))
+            {
+                //TODO:Do something.. 
+			}
+
             if (onMovementDone != null)
             {
                 onMovementDone(body);
@@ -84,6 +95,7 @@ public class GameManager : MonoBehaviour
 
     private void GenerateFood()
 	{
+        //Kazkaip geriau imanoma generuoti
         foodPosition.x = UnityEngine.Random.Range(0, (int)boardSize.x + 1);
         foodPosition.y = UnityEngine.Random.Range(0, (int)boardSize.y + 1);
         onFoodGenerated?.Invoke(foodPosition);
@@ -95,6 +107,23 @@ public class GameManager : MonoBehaviour
 		{
             return true;
 		}
+        return false;
+	}
+
+    private bool IsColliding(Vector2 checkedPosition, List<Vector2> walls, List<Vector2> body)
+	{
+        //galim tikrinti tik sienas
+        if (walls.Contains(checkedPosition))
+		{
+            return true;
+		}
+
+        //galim tikrinti tik kuna
+        if (body.Contains(checkedPosition))
+		{
+            return true;
+		}
+
         return false;
 	}
 
@@ -114,3 +143,5 @@ public class GameManager : MonoBehaviour
         onWallsGenerated?.Invoke(wallsPositions);
 	}
 }
+
+
