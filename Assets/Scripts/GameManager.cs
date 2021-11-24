@@ -2,21 +2,29 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    public Vector2 boardSize;
     public Vector2 direction;
     /// <summary>
     /// Paskutinis elementas visuomet bus galva.
     /// </summary>
-    public List<Vector2> body = new List<Vector2>() { new Vector2(0, 0), };
+    public List<Vector2> body = new List<Vector2>() { };
     public Action<List<Vector2>> onMovementDone;
+    public Action<Vector2> onFoodGenerated;
     private bool needsShrinking = true;
+    public Vector2 foodPosition;
+    public Action<List<Vector2>> onWallsGenerated;
+    public List<Vector2> wallsPositions = new List<Vector2>();
 
 	private void Start()
 	{
+        body.Add(new Vector2((int)(boardSize.x + 1) / 2, (int)(boardSize.y + 1)/ 2));
+        GenerateWalls();
+        GenerateFood();
         StartCoroutine(Movement());
-        StartCoroutine(StartEating());
     }
 
 	void Update()
@@ -49,9 +57,14 @@ public class GameManager : MonoBehaviour
             newHeadPosition = newHeadPosition + direction;
             body.Add(newHeadPosition);
 
+            needsShrinking = !FoodWasEaten(newHeadPosition);
             if (needsShrinking)
             {
                 body.RemoveAt(0);
+            }
+            else
+			{
+                GenerateFood();
             }
             needsShrinking = true;
 
@@ -64,17 +77,40 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private IEnumerator StartEating()
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(2f);
-            Eat();
-        }
-    }
-
     public void Eat()
 	{
         needsShrinking = false;
     }
+
+    private void GenerateFood()
+	{
+        foodPosition.x = UnityEngine.Random.Range(0, (int)boardSize.x + 1);
+        foodPosition.y = UnityEngine.Random.Range(0, (int)boardSize.y + 1);
+        onFoodGenerated?.Invoke(foodPosition);
+    }
+
+    private bool FoodWasEaten(Vector2 coords)
+	{
+        if (coords == foodPosition)
+		{
+            return true;
+		}
+        return false;
+	}
+
+    private void GenerateWalls()
+	{
+        wallsPositions.Clear();
+        for (var i = 0; i <= boardSize.x; i++)
+		{
+            for (var j = 0; j <= boardSize.y; j++)
+			{
+                if (i == 0 || i == boardSize.x || j == 0 || j == boardSize.y)
+				{
+                    wallsPositions.Add(new Vector2(i, j));
+                }
+			}
+		}
+        onWallsGenerated?.Invoke(wallsPositions);
+	}
 }
