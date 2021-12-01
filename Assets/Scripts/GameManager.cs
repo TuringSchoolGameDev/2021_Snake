@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
 {
     public Vector2 boardSize;
     public Vector2 direction;
+    private Vector2 prevDirection;
     /// <summary>
     /// Paskutinis elementas visuomet bus galva.
     /// </summary>
@@ -30,6 +31,7 @@ public class GameManager : MonoBehaviour
 
 	void Update()
     {
+        prevDirection = direction;
         //switch
         if (Input.GetKeyDown(KeyCode.W))
         {
@@ -47,6 +49,10 @@ public class GameManager : MonoBehaviour
         {
             direction = new Vector2(1, 0);
         }
+        if (prevDirection * -1 == direction)
+		{
+            direction = prevDirection;
+		}
     }
 
     IEnumerator Movement()
@@ -76,7 +82,7 @@ public class GameManager : MonoBehaviour
             }
             if (IsColliding(newHeadPosition, wallsPositions, bodyList))
             {
-                //TODO:Do something.. 
+                SceneManager.LoadScene(0);
 			}
 
             if (onMovementDone != null)
@@ -98,6 +104,13 @@ public class GameManager : MonoBehaviour
         //Kazkaip geriau imanoma generuoti
         foodPosition.x = UnityEngine.Random.Range(0, (int)boardSize.x + 1);
         foodPosition.y = UnityEngine.Random.Range(0, (int)boardSize.y + 1);
+        
+        while (IsColliding(foodPosition, wallsPositions, body))
+        {
+            foodPosition.x = UnityEngine.Random.Range(0, (int)boardSize.x + 1);
+            foodPosition.y = UnityEngine.Random.Range(0, (int)boardSize.y + 1);
+        }
+
         onFoodGenerated?.Invoke(foodPosition);
     }
 
